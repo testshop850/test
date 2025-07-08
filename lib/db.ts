@@ -18,12 +18,10 @@ export async function testConnection() {
   }
 }
 
-// Initialize database tables
 export async function initializeDatabase() {
   if (!hasDb) return false
   
   try {
-    // Users table
     await sql`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -38,7 +36,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Categories table
     await sql`
       CREATE TABLE IF NOT EXISTS categories (
         id SERIAL PRIMARY KEY,
@@ -50,7 +47,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Menu items table
     await sql`
       CREATE TABLE IF NOT EXISTS menu_items (
         id SERIAL PRIMARY KEY,
@@ -69,7 +65,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Orders table
     await sql`
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
@@ -89,7 +84,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Order items table
     await sql`
       CREATE TABLE IF NOT EXISTS order_items (
         id SERIAL PRIMARY KEY,
@@ -101,7 +95,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Reviews table
     await sql`
       CREATE TABLE IF NOT EXISTS reviews (
         id SERIAL PRIMARY KEY,
@@ -114,7 +107,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Support tickets table
     await sql`
       CREATE TABLE IF NOT EXISTS support_tickets (
         id SERIAL PRIMARY KEY,
@@ -128,7 +120,6 @@ export async function initializeDatabase() {
       )
     `
 
-    // Create admin user
     const adminExists = await sql`
       SELECT id FROM users WHERE email = 'devolper2011@gmail.com'
     `
@@ -143,7 +134,6 @@ export async function initializeDatabase() {
       `
     }
 
-    // Insert sample categories
     const categoriesExist = await sql`SELECT COUNT(*) as count FROM categories`
     if (categoriesExist[0].count === 0) {
       await sql`
@@ -156,7 +146,6 @@ export async function initializeDatabase() {
       `
     }
 
-    // Insert sample menu items
     const menuItemsExist = await sql`SELECT COUNT(*) as count FROM menu_items`
     if (menuItemsExist[0].count === 0) {
       await sql`

@@ -4,7 +4,7 @@ import { sql, hasDb } from "@/lib/db"
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const period = searchParams.get('period') || 'month' // day, week, month, year
+    const period = searchParams.get('period') || 'month'
 
     if (!hasDb) {
       return NextResponse.json({
@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    // Calculate date range
     let dateFilter = ''
     switch (period) {
       case 'day':
@@ -37,7 +36,6 @@ export async function GET(req: NextRequest) {
         dateFilter = "created_at >= CURRENT_DATE - INTERVAL '30 days'"
     }
 
-    // Total revenue
     const revenueResult = await sql`
       SELECT COALESCE(SUM(total_amount), 0) as total_revenue
       FROM orders 
@@ -45,7 +43,6 @@ export async function GET(req: NextRequest) {
     `
     const totalRevenue = parseFloat(revenueResult[0].total_revenue)
 
-    // Total orders
     const ordersResult = await sql`
       SELECT COUNT(*) as total_orders
       FROM orders 
@@ -53,7 +50,6 @@ export async function GET(req: NextRequest) {
     `
     const totalOrders = parseInt(ordersResult[0].total_orders)
 
-    // Total users
     const usersResult = await sql`
       SELECT COUNT(*) as total_users
       FROM users 
@@ -61,7 +57,6 @@ export async function GET(req: NextRequest) {
     `
     const totalUsers = parseInt(usersResult[0].total_users)
 
-    // Average order value
     const avgOrderResult = await sql`
       SELECT COALESCE(AVG(total_amount), 0) as avg_order_value
       FROM orders 
@@ -69,7 +64,6 @@ export async function GET(req: NextRequest) {
     `
     const averageOrderValue = parseFloat(avgOrderResult[0].avg_order_value)
 
-    // Revenue by period
     const revenueByPeriod = await sql`
       SELECT 
         DATE(created_at) as date,
@@ -80,7 +74,6 @@ export async function GET(req: NextRequest) {
       ORDER BY date
     `
 
-    // Orders by status
     const ordersByStatus = await sql`
       SELECT 
         status,
@@ -90,7 +83,6 @@ export async function GET(req: NextRequest) {
       GROUP BY status
     `
 
-    // Top products
     const topProducts = await sql`
       SELECT 
         mi.name_uz as name,
