@@ -28,7 +28,6 @@ import {
   DollarSign,
   Package,
   AlertCircle,
-  Star,
   Filter,
   Search,
   Download,
@@ -427,7 +426,6 @@ export default function AdminPage() {
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        {/* Header Section */}
         <div className="mb-6 md:mb-8 flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -452,7 +450,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Analytics Cards */}
         {analytics && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
             <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-green-500">
@@ -588,7 +585,6 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="orders">
-            {/* Orders content - similar to existing but enhanced */}
             <Card className="mb-6">
               <CardContent className="p-4">
                 <div className="flex flex-col lg:flex-row gap-4">
@@ -812,7 +808,6 @@ export default function AdminPage() {
         </Tabs>
       </div>
 
-      {/* Order Details Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -826,7 +821,6 @@ export default function AdminPage() {
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-6">
-              {/* Customer Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader className="pb-3">
@@ -882,7 +876,6 @@ export default function AdminPage() {
                 </Card>
               </div>
 
-              {/* Order Items */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -913,7 +906,6 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
 
-              {/* Notes */}
               {selectedOrder.notes && (
                 <Card>
                   <CardHeader>
@@ -928,7 +920,6 @@ export default function AdminPage() {
                 </Card>
               )}
 
-              {/* Order Timeline */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -951,7 +942,6 @@ export default function AdminPage() {
   )
 }
 
-// Enhanced Orders List Component
 function OrdersList({
   orders,
   onUpdateStatus,
