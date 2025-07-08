@@ -33,7 +33,7 @@ interface User {
   created_at: string
 }
 
-export default function AdminPage() {
+export default function AboutPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
   const [orders, setOrders] = useState<Order[]>([])
@@ -44,20 +44,24 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("pending")
   const { toast } = useToast()
   const { t } = useLanguage()
-  const prevOrdersRef = useRef<Order[]>([]) // Oldingi buyurtmalarni saqlash uchun
-  const audioRef = useRef<HTMLAudioElement | null>(null) // Ringtone uchun ref
+  const prevOrdersRef = useRef<Order[]>([])
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const ADMIN_PASSWORD = "admin123"
 
   useEffect(() => {
-    // Audio ob'ektini yaratish
-    audioRef.current = new Audio("/notification.mp3")
-    audioRef.current.preload = "auto"
+    if (typeof window !== 'undefined') {
+      try {
+        audioRef.current = new Audio("/notification.mp3")
+        audioRef.current.preload = "auto"
+      } catch (error) {
+        console.error("Audio yuklashda xato:", error)
+      }
+    }
 
     if (isAuthenticated) {
       fetchOrders()
       fetchUsers()
-      // Auto-refresh har 30 soniyada
       const interval = setInterval(() => {
         fetchOrders()
         fetchUsers()
@@ -89,25 +93,23 @@ export default function AdminPage() {
         const data = await response.json()
         const newOrders = data.orders || []
 
-        // Yangi buyurtmalarni aniqlash
         const currentOrderIds = new Set(orders.map((order) => order.id))
         const newOrderIds = newOrders.filter((order: Order) => !currentOrderIds.has(order.id))
 
-        if (newOrderIds.length > 0) {
-          // Yangi buyurtma kelganda ringtone o'ynash
-          if (audioRef.current) {
+        if (newOrderIds.length > 0 && audioRef.current) {
+          try {
             audioRef.current.play().catch((error) => console.error("Ringtone oynatishda xato:", error))
-            // 5 soniyadan keyin ringtone to'xtatish
             setTimeout(() => {
               if (audioRef.current) {
                 audioRef.current.pause()
                 audioRef.current.currentTime = 0
               }
             }, 5000)
+          } catch (error) {
+            console.error("Audio o'ynashda xato:", error)
           }
         }
 
-        // Buyurtmalarni yangilash
         setOrders(newOrders)
         prevOrdersRef.current = newOrders
       }
@@ -154,9 +156,7 @@ export default function AdminPage() {
           title: t("success"),
           description: `Buyurtma holati ${getStatusText(status)} ga o'zgartirildi`,
         })
-        // Lokal holatni darhol yangilash
         setOrders((prevOrders) => prevOrders.map((order) => (order.id === orderId ? { ...order, status } : order)))
-        // Yangi ma'lumotlarni olish
         fetchOrders()
       }
     } catch (error) {
@@ -208,37 +208,6 @@ export default function AdminPage() {
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending":
-        return Clock
-      case "confirmed":
-        return Check
-      case "preparing":
-        return ChefHat
-      case "ready":
-        return Truck
-      case "delivered":
-        return CheckCircle
-      default:
-        return Clock
-    }
-  }
-
-  // Buyurtmalarni holat bo'yicha filtrlash
-  const filterOrdersByStatus = (status: string) => {
-    switch (status) {
-      case "pending":
-        return orders.filter((order) => order.status === "pending")
-      case "active":
-        return orders.filter((order) => ["confirmed", "preparing", "ready"].includes(order.status))
-      case "completed":
-        return orders.filter((order) => order.status === "delivered")
-      default:
-        return orders
-    }
-  }
-
   const getNextStatus = (currentStatus: string) => {
     switch (currentStatus) {
       case "pending":
@@ -257,6 +226,19 @@ export default function AdminPage() {
   const getNextStatusText = (currentStatus: string) => {
     const nextStatus = getNextStatus(currentStatus)
     return nextStatus ? getStatusText(nextStatus) : null
+  }
+
+  const filterOrdersByStatus = (status: string) => {
+    switch (status) {
+      case "pending":
+        return orders.filter((order) => order.status === "pending")
+      case "active":
+        return orders.filter((order) => ["confirmed", "preparing", "ready"].includes(order.status))
+      case "completed":
+        return orders.filter((order) => order.status === "delivered")
+      default:
+        return orders
+    }
   }
 
   if (!isAuthenticated) {
@@ -316,7 +298,6 @@ export default function AdminPage() {
           </Button>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardContent className="p-4 md:p-6">
@@ -591,7 +572,6 @@ export default function AdminPage() {
         </Tabs>
       </div>
 
-      {/* Order Details Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -645,7 +625,6 @@ export default function AdminPage() {
   )
 }
 
-// Orders List Component
 function OrdersList({
   orders,
   onUpdateStatus,
